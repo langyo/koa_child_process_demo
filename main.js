@@ -1,23 +1,29 @@
 import { fork } from 'child_process';
 import EventEmitter from 'events';
+import Koa from 'koa';
 
 let emitter = new EventEmitter();
 let child = fork('./child.js');
 
 child.on('message', n => emitter.emit('message', n));
 
-let listener1 = n => {
-  console.log('Parent 1', n);
-  emitter.off('message', listener1);
-  child.send(2);
-};
+const app = new Koa();
 
-emitter.on('message', listener1);
+app.use(async (ctx, next) => {
+  console.log('[Parent] Get new request.', ctx.req.query);
+  return await (new Promise(resolve => {
+    const listener = ret => {
+      console.log('[Parent] Get the child\'s message.', ret);
+      ctx.response.body = ret;
+      ctx.response.type = 'text/html';
+      next();
+      emitter.off('message', listener);
+      resolve();
+    }
+    emitter.on('message', listener);
+    child.send(ctx.req.query || {});
+  }));
+});
 
-let listener2 = n => {
-  console.log('Parent 2', n);
-  emitter.off('message', listener2);
-};
-emitter.on('message', listener2);
-
-child.send(1);
+app.listen(3000);
+console.log('[Parent] Listening on the port 3000.');
