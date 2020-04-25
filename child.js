@@ -1,4 +1,3 @@
-process.on('message', payload => {
-  console.log('[Child]', payload);
-  process.send(`123321`);
-});
+import { childCreator } from './childProcessCreator';
+
+childCreator(() => 'hello');

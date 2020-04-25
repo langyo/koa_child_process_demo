@@ -21,6 +21,7 @@
     "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.9.5",
-    "koa": "^2.11.0"
+    "koa": "^2.11.0",
+    "shortid": "^2.2.15"
   }
 }
