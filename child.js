@@ -1,3 +1,6 @@
 import { childCreator } from './childProcessCreator';
 
-childCreator(() => 'hello');
+childCreator(payload => {
+  console.log('[Child] Get request!', payload);
+  return 'test';
+});

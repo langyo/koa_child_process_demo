@@ -5,7 +5,7 @@ const { send } = creator('./child.js');
 const app = new Koa();
 
 app.use(async (ctx, next) => {
-  console.log('[Parent] Get new request.', ctx.req.query);
+  console.log('[Parent] Get new request.', ctx.req.url);
   ctx.response.body = await send();
   ctx.response.type = 'text/html';
 });

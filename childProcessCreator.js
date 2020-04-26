@@ -46,6 +46,6 @@ export const parentCreator = link => {
 };
 
 export const childCreator = processor =>
-  process.on('message', ({ payload, id }) => ({
+  process.on('message', ({ payload, id }) => process.send({
     payload: processor(payload), id
   }));
