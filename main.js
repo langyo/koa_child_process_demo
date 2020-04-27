@@ -12,5 +12,3 @@ app.use(async (ctx, next) => {
 
 app.listen(3000);
 console.log('[Parent] Listening on the port 3000.');
-
-setTimeout(restart, 2000);

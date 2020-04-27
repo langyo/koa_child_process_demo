@@ -6,7 +6,6 @@ export const parentCreator = link => {
   let process = fork(link);
   let emitter = new EventEmitter();
 
-  let restartFlag = false, taskCount = 0;
 
   const watch = () => {
     process.on('message', ({ payload, id, type }) => {
@@ -22,12 +21,9 @@ export const parentCreator = link => {
   return {
     send: async payload => {
       return await new Promise(resolve => {
-        while (restartFlag);
-        taskCount += 1;
         const myId = generate();
         const fn = ({ payload, id }) => {
           if (myId === id) {
-            taskCount -= 1;
             resolve(payload);
             emitter.off('message', fn);
           }
@@ -37,13 +33,9 @@ export const parentCreator = link => {
       });
     },
     restart: () => {
-      restartFlag = true;
-      while (taskCount > 0);
       process.kill();
       const fn = () => {
-        restartFlag = false;
         emitter.off('init', fn);
-        console.log('[Parent] Restart succeed.')
       };
       emitter.once('init', fn);
       process = fork(link);
@@ -56,9 +48,9 @@ export const parentCreator = link => {
 export const childCreator = processor =>
   process.on('message', ({ payload, id, type }) => {
     if (type === 'normal') {
-      process.send({
-        payload: processor(payload), id, type
-      });
+      processor(payload).then(payload => process.send({
+        payload, id, type
+      }));
     } else if (type === 'init') {
       process.send({ type });
     }
